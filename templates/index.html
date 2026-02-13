@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PVOIL Nam Định - Xử lý BKHD</title>
+    <link rel="icon" href="{{ url_for('static', filename='Logo.png') }}" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes blinker { 50% { opacity: 0.7; } }
+        .blinking-warning { animation: blinker 1.5s linear infinite; }
+        .loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #4f46e5; width: 32px; height: 32px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .scale-in { animation: scaleIn 0.2s ease-out; }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-10 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+        <div class="bg-white p-8 border-b border-slate-100">
+            <div class="flex items-center justify-center space-x-5 mb-6">
+                <img src="{{ url_for('static', filename='Logo.png') }}" alt="PVOIL" class="h-24"> 
+                <div class="text-left">
+                    <h2 class="text-xl font-black text-red-600 tracking-tighter uppercase leading-tight">Công Ty Cổ Phần Xăng Dầu</h2>
+                    <h2 class="text-xl font-black text-red-600 tracking-tighter uppercase leading-tight">Dầu Khí Nam Định</h2>
+                </div>
+            </div>
+            <div class="h-1 w-20 bg-indigo-600 mx-auto rounded-full"></div>
+            <h1 class="text-2xl font-bold text-center text-slate-800 mt-6 tracking-tight">Công cụ xử lý dữ liệu UpSSE_BB</h1>
+        </div>
+
+        <div class="p-8">
+            <div id="alert-container"></div>
+            <div class="mb-8 p-5 bg-indigo-50 border border-indigo-100 rounded-2xl">
+                <h4 class="text-sm font-bold text-indigo-800 mb-3 flex items-center italic">HƯỚNG DẪN SỬ DỤNG:</h4>
+                <ul class="list-disc list-inside space-y-2 text-sm text-slate-700">
+                    <li>Sử dụng file <span class="font-bold">Bảng kê hóa đơn (BKHD)</span> kết xuất từ hệ thống HĐĐT.</li>
+                    <li>Sử dụng file <span class="font-bold">BM19</span> để lấy thông tin Nhiệt độ và Tỷ trọng thực tế.</li>
+                    <li>Công cụ sẽ tự tách dòng <span class="font-bold">Thuế BVMT</span> xuống cuối danh sách.</li>
+                </ul>
+            </div>
+
+            <form id="upload-form" class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">1. Bảng kê hóa đơn (BKHD)</label>
+                    <input type="file" name="file_bkhd" required class="w-full border-2 border-slate-100 p-3 rounded-xl text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500/20 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">2. Biểu mẫu BM19 (Tùy chọn)</label>
+                    <input type="file" name="file_bm19" class="w-full border-2 border-slate-100 p-3 rounded-xl text-sm bg-slate-50 outline-none">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-lg uppercase tracking-wide">
+                    Xử lý & Tải về SVDetail9
+                </button>
+            </form>
+
+            <div id="loading" class="hidden mt-8 text-center scale-in">
+                <div class="loader inline-block mb-3"></div>
+                <p class="text-sm font-bold text-indigo-600">Đang phân tích và xử lý định khoản...</p>
+            </div>
+
+            <div class="mt-10 blinking-warning bg-amber-50 border border-amber-200 p-5 rounded-2xl text-center">
+                <p class="font-black text-red-600 uppercase text-sm mb-1">Lưu ý quan trọng!</p>
+                <p class="text-xs text-amber-800 font-medium">Sau khi tải về, hãy mở file lên và ấn <span class="font-bold">Lưu (Ctrl+S)</span> trước khi đồng bộ lên hệ thống SSE.</p>
+            </div>
+        </div>
+        
+        <div class="bg-slate-50 p-6 text-center border-t border-slate-100">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hệ thống xử lý nội bộ PVOIL Nam Định</p>
+            <p class="text-[10px] text-slate-400">Phát triển bởi Nguyễn Trọng Hoàn - 0902.069.469</p>
+        </div>
+    </div>
+
+    <!-- MODAL XÁC NHẬN NGÀY -->
+    <div id="date-modal" class="fixed inset-0 bg-slate-900/80 hidden flex items-center justify-center p-4 z-50 backdrop-blur-md">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl scale-in">
+            <h3 class="text-xl font-black text-slate-900 mb-2">Xác nhận Ngày</h3>
+            <p class="text-sm text-slate-500 mb-8 font-medium">Hệ thống phát hiện ngày tháng không rõ ràng. Vui lòng xác nhận ngày đúng trên hóa đơn:</p>
+            <div class="space-y-3">
+                <button id="opt-1" class="group w-full text-left p-4 border-2 border-slate-100 rounded-2xl hover:border-indigo-600 transition-all">
+                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 group-hover:text-indigo-400">Phương án 01</span>
+                    <span class="block font-bold text-slate-700 group-hover:text-indigo-900 text-lg" id="opt-1-text">-</span>
+                </button>
+                <button id="opt-2" class="group w-full text-left p-4 border-2 border-slate-100 rounded-2xl hover:border-indigo-600 transition-all">
+                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 group-hover:text-indigo-400">Phương án 02</span>
+                    <span class="block font-bold text-slate-700 group-hover:text-indigo-900 text-lg" id="opt-2-text">-</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('upload-form');
+        const modal = document.getElementById('date-modal');
+        const loading = document.getElementById('loading');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            loading.classList.remove('hidden');
+            processRequest(new FormData(form));
+        };
+
+        async function processRequest(formData) {
+            try {
+                const response = await fetch('/process', { method: 'POST', body: formData });
+                if (response.headers.get('Content-Type').includes('application/json')) {
+                    const result = await response.json();
+                    loading.classList.add('hidden');
+                    if (result.status === 'ambiguous') {
+                        document.getElementById('opt-1-text').innerText = `Ngày ${result.opt1.d} tháng ${result.opt1.m}`;
+                        document.getElementById('opt-2-text').innerText = `Ngày ${result.opt2.d} tháng ${result.opt2.m}`;
+                        document.getElementById('opt-1').onclick = () => confirmDate(formData, result.opt1.full);
+                        document.getElementById('opt-2').onclick = () => confirmDate(formData, result.opt2.full);
+                        modal.classList.remove('hidden');
+                    } else if (result.status === 'error') { showAlert(result.message, 'danger'); }
+                } else {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = "SVDetail9_Result.xlsx";
+                    document.body.appendChild(a); a.click();
+                    window.URL.revokeObjectURL(url);
+                    loading.classList.add('hidden');
+                    showAlert('Xử lý thành công! Tệp đã tải xuống.', 'success');
+                }
+            } catch (err) { loading.classList.add('hidden'); showAlert('Lỗi hệ thống.', 'danger'); }
+        }
+
+        function confirmDate(formData, dateStr) {
+            formData.append('confirmed_date', dateStr);
+            modal.classList.add('hidden'); loading.classList.remove('hidden');
+            processRequest(formData);
+        }
+
+        function showAlert(msg, type) {
+            const container = document.getElementById('alert-container');
+            container.innerHTML = `<div class="mb-6 p-4 rounded-2xl text-sm font-bold ${type === 'danger' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'} scale-in">${msg}</div>`;
+        }
+    </script>
+</body>
+</html>

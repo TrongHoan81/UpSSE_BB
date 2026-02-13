@@ -1,0 +1,164 @@
+--- LOG TRÍCH XUẤT ---
+Found STT at row index: 9
+Column Mapping Result: {'TEN_KH': 4, 'MST': 6, 'MAT_HANG': 7, 'SO_LUONG': 9, 'DVT': 11, 'THANH_TIEN': 14, 'VAT': 15, 'TIEN_THUE_BKHD': 16, 'MAU_SO': 18, 'KY_HIEU': 19, 'SO_HD': 20, 'NGAY_HD': 21}
+
+--- TÍNH TOÁN CHI TIẾT ---
+HĐ: K26TK01029 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 12023000.0 | Thuế trên BVMT: 961840.0
+  > Ghi Template: Thuế(O)=15184604.0 | Hàng(W)=189807546.0
+HĐ: K26TK01030 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 4010000.0 | Thuế trên BVMT: 320800.0
+  > Ghi Template: Thuế(O)=5064481.0 | Hàng(W)=63306019.0
+HĐ: K26TK01031 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 17229000.0 | Thuế trên BVMT: 1378320.0
+  > Ghi Template: Thuế(O)=21759589.0 | Hàng(W)=271994861.0
+HĐ: K26TK01032 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 6007000.0 | Thuế trên BVMT: 480560.0
+  > Ghi Template: Thuế(O)=7582169.0 | Hàng(W)=94777111.0
+HĐ: K26TK01033 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 10028000.0 | Thuế trên BVMT: 802240.0
+  > Ghi Template: Thuế(O)=6065083.0 | Hàng(W)=75813537.0
+HĐ: K26TK01034 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 6034000.0 | Thuế trên BVMT: 482720.0
+  > Ghi Template: Thuế(O)=7638597.0 | Hàng(W)=95482463.0
+HĐ: K26TK01035 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 22179000.0 | Thuế trên BVMT: 1774320.0
+  > Ghi Template: Thuế(O)=27912682.0 | Hàng(W)=348908528.0
+HĐ: K26TK01036 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 9583000.0 | Thuế trên BVMT: 766640.0
+  > Ghi Template: Thuế(O)=12060383.0 | Hàng(W)=150754787.0
+HĐ: K26TK01037 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 21305000.0 | Thuế trên BVMT: 1704400.0
+  > Ghi Template: Thuế(O)=26812737.0 | Hàng(W)=335159213.0
+HĐ: K26TK01038 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 16020000.0 | Thuế trên BVMT: 1281600.0
+  > Ghi Template: Thuế(O)=18796800.0 | Hàng(W)=234960000.0
+HĐ: K26TK01039 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 21155000.0 | Thuế trên BVMT: 1692400.0
+  > Ghi Template: Thuế(O)=26623959.0 | Hàng(W)=332799491.0
+HĐ: K26TK01040 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 39530000.0 | Thuế trên BVMT: 3162400.0
+  > Ghi Template: Thuế(O)=23908330.0 | Hàng(W)=298854120.0
+HĐ: K26TK01041 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 20000000.0 | Thuế trên BVMT: 1600000.0
+  > Ghi Template: Thuế(O)=25170370.0 | Hàng(W)=314629630.0
+HĐ: K26TK01042 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 23075000.0 | Thuế trên BVMT: 1846000.0
+  > Ghi Template: Thuế(O)=29040315.0 | Hàng(W)=363003935.0
+HĐ: K26TK01043 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 8000000.0 | Thuế trên BVMT: 640000.0
+  > Ghi Template: Thuế(O)=4838519.0 | Hàng(W)=60481481.0
+HĐ: K26TK01044 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 12014000.0 | Thuế trên BVMT: 961120.0
+  > Ghi Template: Thuế(O)=7270695.0 | Hàng(W)=90883685.0
+HĐ: K26TK01045 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 9948000.0 | Thuế trên BVMT: 795840.0
+  > Ghi Template: Thuế(O)=6020382.0 | Hàng(W)=75254778.0
+HĐ: K26TK01046 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 37778000.0 | Thuế trên BVMT: 3022240.0
+  > Ghi Template: Thuế(O)=22848694.0 | Hàng(W)=285608676.0
+HĐ: K26TK01047 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 22140000.0 | Thuế trên BVMT: 1771200.0
+  > Ghi Template: Thuế(O)=27863600.0 | Hàng(W)=348295000.0
+HĐ: K26TK01048 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 5480000.0 | Thuế trên BVMT: 438400.0
+  > Ghi Template: Thuế(O)=3314385.0 | Hàng(W)=41429815.0
+HĐ: K26TK01049 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 26070000.0 | Thuế trên BVMT: 2085600.0
+  > Ghi Template: Thuế(O)=15719244.0 | Hàng(W)=196490556.0
+HĐ: K26TK01050 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 20055000.0 | Thuế trên BVMT: 1604400.0
+  > Ghi Template: Thuế(O)=25239589.0 | Hàng(W)=315494861.0
+HĐ: K26TK01051 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 10852000.0 | Thuế trên BVMT: 868160.0
+  > Ghi Template: Thuế(O)=13657443.0 | Hàng(W)=170718037.0
+HĐ: K26TK01052 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 22737000.0 | Thuế trên BVMT: 1818960.0
+  > Ghi Template: Thuế(O)=28614936.0 | Hàng(W)=357686694.0
+HĐ: K26TK01053 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 10018000.0 | Thuế trên BVMT: 801440.0
+  > Ghi Template: Thuế(O)=6062745.0 | Hàng(W)=75784315.0
+HĐ: K26TK01054 | Hàng: DẦU ĐIÊZEN 0,001S MỨC 5
+  > Thuế BVMT: 483000.0 | Thuế trên BVMT: 38640.0
+  > Ghi Template: Thuế(O)=625753.0 | Hàng(W)=7821917.0
+HĐ: K26TK01055 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 32072000.0 | Thuế trên BVMT: 2565760.0
+  > Ghi Template: Thuế(O)=19409499.0 | Hàng(W)=242618741.0
+HĐ: K26TK01056 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 35320000.0 | Thuế trên BVMT: 2825600.0
+  > Ghi Template: Thuế(O)=21362059.0 | Hàng(W)=267025741.0
+HĐ: K26TK01057 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 12068000.0 | Thuế trên BVMT: 965440.0
+  > Ghi Template: Thuế(O)=7303375.0 | Hàng(W)=91292185.0
+HĐ: K26TK01058 | Hàng: DẦU ĐIÊZEN 0,001S MỨC 5
+  > Thuế BVMT: 6007000.0 | Thuế trên BVMT: 480560.0
+  > Ghi Template: Thuế(O)=7809100.0 | Hàng(W)=97613750.0
+HĐ: K26TK01059 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 15252000.0 | Thuế trên BVMT: 1220160.0
+  > Ghi Template: Thuế(O)=19194924.0 | Hàng(W)=239936556.0
+HĐ: K26TK01060 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 8060000.0 | Thuế trên BVMT: 644800.0
+  > Ghi Template: Thuế(O)=4859881.0 | Hàng(W)=60748519.0
+HĐ: K26TK01061 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 12939000.0 | Thuế trên BVMT: 1035120.0
+  > Ghi Template: Thuế(O)=16283971.0 | Hàng(W)=203549639.0
+HĐ: K26TK01062 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 46150000.0 | Thuế trên BVMT: 3692000.0
+  > Ghi Template: Thuế(O)=27912204.0 | Hàng(W)=348902546.0
+HĐ: K26TK01063 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 6600000.0 | Thuế trên BVMT: 528000.0
+  > Ghi Template: Thuế(O)=8306222.0 | Hàng(W)=103827778.0
+HĐ: K26TK01064 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 7820000.0 | Thuế trên BVMT: 625600.0
+  > Ghi Template: Thuế(O)=9841615.0 | Hàng(W)=123020185.0
+HĐ: K26TK01065 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 100000000.0 | Thuế trên BVMT: 8000000.0
+  > Ghi Template: Thuế(O)=60296296.0 | Hàng(W)=753703704.0
+HĐ: K26TK01066 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 127408000.0 | Thuế trên BVMT: 10192640.0
+  > Ghi Template: Thuế(O)=158457801.0 | Hàng(W)=1980722519.0
+HĐ: K26TK01067 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 35062000.0 | Thuế trên BVMT: 2804960.0
+  > Ghi Template: Thuế(O)=21206017.0 | Hàng(W)=265075213.0
+HĐ: K26TK01068 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 10835000.0 | Thuế trên BVMT: 866800.0
+  > Ghi Template: Thuế(O)=13636048.0 | Hàng(W)=170450602.0
+HĐ: K26TK01069 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 3707000.0 | Thuế trên BVMT: 296560.0
+  > Ghi Template: Thuế(O)=4679058.0 | Hàng(W)=58488222.0
+HĐ: K26TK01070 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 4005000.0 | Thuế trên BVMT: 320400.0
+  > Ghi Template: Thuế(O)=4998833.0 | Hàng(W)=62485417.0
+HĐ: K26TK01071 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 8016000.0 | Thuế trên BVMT: 641280.0
+  > Ghi Template: Thuế(O)=4851164.0 | Hàng(W)=60639556.0
+HĐ: K26TK01072 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 4005000.0 | Thuế trên BVMT: 320400.0
+  > Ghi Template: Thuế(O)=4998833.0 | Hàng(W)=62485417.0
+HĐ: K26TK01073 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 8000000.0 | Thuế trên BVMT: 640000.0
+  > Ghi Template: Thuế(O)=4841481.0 | Hàng(W)=60518519.0
+HĐ: K26TK01074 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 19000000.0 | Thuế trên BVMT: 1520000.0
+  > Ghi Template: Thuế(O)=23911852.0 | Hàng(W)=298898148.0
+HĐ: K26TK01075 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 6600000.0 | Thuế trên BVMT: 528000.0
+  > Ghi Template: Thuế(O)=8306222.0 | Hàng(W)=103827778.0
+HĐ: K26TK01076 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 24440000.0 | Thuế trên BVMT: 1955200.0
+  > Ghi Template: Thuế(O)=14781674.0 | Hàng(W)=184770926.0
+HĐ: K26TK01077 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 8026000.0 | Thuế trên BVMT: 642080.0
+  > Ghi Template: Thuế(O)=4854244.0 | Hàng(W)=60678046.0
+HĐ: K26TK01078 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 4009000.0 | Thuế trên BVMT: 320720.0
+  > Ghi Template: Thuế(O)=5075097.0 | Hàng(W)=63438713.0
+HĐ: K26TK01079 | Hàng: XĂNG RON95 MỨC 3
+  > Thuế BVMT: 8012000.0 | Thuế trên BVMT: 640960.0
+  > Ghi Template: Thuế(O)=4860613.0 | Hàng(W)=60757667.0
+HĐ: K26TK01080 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 17660000.0 | Thuế trên BVMT: 1412800.0
+  > Ghi Template: Thuế(O)=22225437.0 | Hàng(W)=277817963.0
+HĐ: K26TK01081 | Hàng: DẦU ĐIÊZEN 0,05S MỨC 2
+  > Thuế BVMT: 50000000.0 | Thuế trên BVMT: 4000000.0
+  > Ghi Template: Thuế(O)=62555556.0 | Hàng(W)=781944444.0
