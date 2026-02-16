@@ -1,6 +1,7 @@
 import io
 import os
 import pandas as pd
+from datetime import datetime
 from openpyxl import load_workbook, Workbook
 from .utils import (
     normalize_mst, format_tax_code, clean_string, to_float, 
@@ -8,7 +9,7 @@ from .utils import (
 )
 
 def load_bvmt_mapping():
-    """Tải đơn giá phí Bảo vệ môi trường."""
+    """Tải đơn giá thuế Bảo vệ môi trường từ Data/BVMT.xlsx."""
     mapping = {}
     path = os.path.join('Data', 'BVMT.xlsx')
     if not os.path.exists(path): return mapping
@@ -22,7 +23,7 @@ def load_bvmt_mapping():
     return mapping
 
 def load_makho_mapping():
-    """Tải mã kho từ danh mục."""
+    """Tải mã kho từ Data/MaKho_MaVV.xlsx."""
     mapping = {}
     path = os.path.join('Data', 'MaKho_MaVV.xlsx')
     if not os.path.exists(path): return mapping
@@ -37,7 +38,7 @@ def load_makho_mapping():
     return mapping
 
 def load_vuviec_matrix():
-    """Tải ma trận Vụ việc (Kho x Mặt hàng)."""
+    """Tải ma trận mã vụ việc Kho x Mặt hàng từ Data/MaKho_MaVV.xlsx."""
     matrix = {}
     path = os.path.join('Data', 'MaKho_MaVV.xlsx')
     if not os.path.exists(path): return matrix
@@ -60,7 +61,7 @@ def load_vuviec_matrix():
     return matrix
 
 def load_mahh_mapping():
-    """Tải mã hàng và hệ số VCF dự phòng theo mùa."""
+    """Tải danh mục mặt hàng và hệ số VCF từ Data/MaHH.xlsx."""
     code_mapping = {}
     vcf_mapping = {}
     path = os.path.join('Data', 'MaHH.xlsx')
@@ -79,9 +80,13 @@ def load_mahh_mapping():
     return code_mapping, vcf_mapping
 
 def load_accounts_mapping():
-    """Tải cấu hình tài khoản định khoản (B2-B7 và B10)."""
+    """Tải danh sách tài khoản định khoản từ Data/DanhSachTaiKhoan.xlsx."""
     path = os.path.join('Data', 'DanhSachTaiKhoan.xlsx')
-    acc = {'tk_no': "", 'tk_thue_co': "", 'tk_thue_no': "", 'tk_dt': "", 'tk_kho': "", 'tk_gia_von': "", 'tk_dt_bvmt': ""}
+    acc = {
+        'tk_no': "", 'tk_thue_co': "", 'tk_thue_no': "", 
+        'tk_dt': "", 'tk_kho': "", 'tk_gia_von': "",
+        'tk_dt_bvmt': ""
+    }
     if not os.path.exists(path): return acc
     try:
         df = pd.read_excel(path, header=None)
@@ -97,16 +102,21 @@ def load_accounts_mapping():
 
 def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=None):
     """
-    Điền dữ liệu theo 2 giai đoạn: Hàng hóa sạch sau đó là Thuế BVMT.
-    Sử dụng logic Triple Match và Fuzzy Matching cho tên khách hàng.
+    Ghép nối và xử lý định khoản.
+    Đã sửa lỗi khoảng trắng thừa gây sai lệch định dạng ngày tháng.
     """
+    print(f"\n[LOG] --- BẮT ĐẦU XỬ LÝ GHÉP NỐI ---")
+    
+    # LÀM SẠCH KHOẢNG TRẮNG CỦA NGÀY NGAY LÚC NHẬN
+    clean_manual_date = str(manual_date).strip() if manual_date else None
+    print(f"[LOG] manual_date sau khi làm sạch: '{clean_manual_date}'")
+
     bvmt_map = load_bvmt_mapping()
     makho_map = load_makho_mapping()
     vuviec_matrix = load_vuviec_matrix()
     mahh_code_map, mahh_vcf_map = load_mahh_mapping()
     acc_map = load_accounts_mapping()
     
-    # Tra cứu khách hàng từ DSKH.xlsx
     customer_map = {}
     dskh_path = os.path.join('Data', 'DSKH.xlsx')
     if os.path.exists(dskh_path):
@@ -117,44 +127,37 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
                 if mst: customer_map[mst] = ma_sse
         except: pass
 
-    if os.path.exists(template_path): 
-        wb = load_workbook(template_path)
-        ws = wb.active
-    else: 
-        wb = Workbook(); ws = wb.active
+    if os.path.exists(template_path): wb = load_workbook(template_path); ws = wb.active
+    else: wb = Workbook(); ws = wb.active
 
-    # --- GIAI ĐOẠN 1: ĐIỀN TOÀN BỘ DÒNG HÀNG HÓA ---
+    # 1. CHUYỂN ĐỔI NGÀY SANG DATE OBJECT
+    final_date_obj = None
+    if clean_manual_date:
+        try:
+            final_date_obj = datetime.strptime(clean_manual_date, '%d/%m/%Y')
+            print(f"[LOG] Chuyển đổi sang Datetime thành công: {final_date_obj}")
+        except Exception as e:
+            print(f"[LOG] CẢNH BÁO: Không thể parse '{clean_manual_date}'. Lỗi: {e}")
+            final_date_obj = clean_manual_date
+
+    # --- GIAI ĐOẠN 1: DÒNG HÀNG HÓA ---
     curr_row = 6
     for item in invoice_data:
-        final_date = manual_date if manual_date else item.get('auto_date', "")
         mat_hang_hd = item['mat_hang'].upper().strip()
         ten_kh_hd = item['ten_kh']
         sl_hd = round(item['so_luong'], 3)
         ten_kho_hd = item['kho_xuat_bkhd'].upper().strip()
-        invoice_no_disp = f"{item['ky_hieu'][:5]}{item['so_hd'][-5:].zfill(5)}"
-        sign_disp = f"{item['mau_so']}{item['ky_hieu']}"
 
-        # 1. Tra cứu BM19 (Khớp 3 yếu tố)
+        # Tra cứu BM19
         nhiet_do = None; ty_trong = None
         matches = [b for b in bm19_data if b['mat_hang'] == mat_hang_hd and b['so_luong'] == sl_hd]
         best_match = None; highest_score = 0.0
         for p in matches:
             score = calculate_similarity(ten_kh_hd, p['ten_kh'])
-            if score > highest_score:
-                highest_score = score; best_match = p
+            if score > highest_score: highest_score = score; best_match = p
         if best_match and highest_score >= 0.9:
             nhiet_do = best_match['temp']; ty_trong = best_match['dens']
 
-        # 2. VCF vùng miền nếu trống số liệu thực tế
-        vcf_vung_mien = ""
-        if nhiet_do is None and ty_trong is None:
-            try:
-                month = int(final_date.split('/')[1])
-                season = 'winter' if month in [1, 2, 3, 4, 11, 12] else 'summer'
-                if mat_hang_hd in mahh_vcf_map: vcf_vung_mien = mahh_vcf_map[mat_hang_hd][season]
-            except: pass
-
-        # 3. Phân tách Thuế phí
         don_gia_bvmt = bvmt_map.get(mat_hang_hd, 0)
         vat_rate = to_tax_rate_float(item['vat_raw'])
         tien_thue_bvmt = sl_hd * don_gia_bvmt
@@ -164,19 +167,18 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         tien_hang_line1 = item['thanh_tien_total_bkhd'] - tien_thue_bvmt
         gia_ban_line1 = item['don_gia_bkhd'] - don_gia_bvmt
 
-        # Ghi Dòng 1
+        # Ghi dữ liệu
         ws.cell(row=curr_row, column=1).value = customer_map.get(item['mst_key'], "")
         ws.cell(row=curr_row, column=2).value = ten_kh_hd
-        ws.cell(row=curr_row, column=3).value = final_date
-        ws.cell(row=curr_row, column=4).value = invoice_no_disp
-        ws.cell(row=curr_row, column=5).value = sign_disp
+        ws.cell(row=curr_row, column=3).value = final_date_obj
+        ws.cell(row=curr_row, column=4).value = f"{item['ky_hieu'][:5]}{item['so_hd'][-5:].zfill(5)}"
+        ws.cell(row=curr_row, column=5).value = f"{item['mau_so']}{item['ky_hieu']}"
         ws.cell(row=curr_row, column=6).value = f"Xuất bán {item['mat_hang']} theo HĐ {item['so_hd']} số lượng {sl_hd} lít"
         ws.cell(row=curr_row, column=7).value = acc_map['tk_no']
-        ws.cell(row=curr_row, column=11).value = ty_trong # K
-        ws.cell(row=curr_row, column=12).value = nhiet_do # L
-        ws.cell(row=curr_row, column=13).value = vcf_vung_mien # M
-        ws.cell(row=curr_row, column=14).value = format_tax_code(item['vat_raw']) # N
-        ws.cell(row=curr_row, column=15).value = tien_thue_line1 # O
+        ws.cell(row=curr_row, column=11).value = ty_trong 
+        ws.cell(row=curr_row, column=12).value = nhiet_do 
+        ws.cell(row=curr_row, column=14).value = format_tax_code(item['vat_raw'])
+        ws.cell(row=curr_row, column=15).value = tien_thue_line1
         ws.cell(row=curr_row, column=16).value = acc_map['tk_thue_co']
         ws.cell(row=curr_row, column=17).value = acc_map['tk_thue_no']
         ws.cell(row=curr_row, column=18).value = mahh_code_map.get(mat_hang_hd, "")
@@ -191,13 +193,11 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         
         ma_vv = ""
         if ten_kho_hd in vuviec_matrix: ma_vv = vuviec_matrix[ten_kho_hd].get(mat_hang_hd, "")
-        ws.cell(row=curr_row, column=28).value = ma_vv # AB
-        
+        ws.cell(row=curr_row, column=28).value = ma_vv
         curr_row += 1
 
-    # --- GIAI ĐOẠN 2: ĐIỀN TOÀN BỘ DÒNG THUẾ BVMT ---
+    # --- GIAI ĐOẠN 2: DÒNG THUẾ BVMT ---
     for item in invoice_data:
-        final_date = manual_date if manual_date else item.get('auto_date', "")
         mat_hang_hd = item['mat_hang'].upper().strip()
         ten_kho_hd = item['kho_xuat_bkhd'].upper().strip()
         sl_hd = round(item['so_luong'], 3)
@@ -205,35 +205,58 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         vat_rate = to_tax_rate_float(item['vat_raw'])
         tien_thue_bvmt = sl_hd * don_gia_bvmt
         thue_tren_bvmt = tien_thue_bvmt * vat_rate
-        
         ma_kho = makho_map.get(ten_kho_hd, "")
         ma_vv = ""
         if ten_kho_hd in vuviec_matrix: ma_vv = vuviec_matrix[ten_kho_hd].get(mat_hang_hd, "")
 
         ws.cell(row=curr_row, column=1).value = customer_map.get(item['mst_key'], "")
         ws.cell(row=curr_row, column=2).value = item['ten_kh']
-        ws.cell(row=curr_row, column=3).value = final_date
+        ws.cell(row=curr_row, column=3).value = final_date_obj
         ws.cell(row=curr_row, column=4).value = f"{item['ky_hieu'][:5]}{item['so_hd'][-5:].zfill(5)}"
         ws.cell(row=curr_row, column=5).value = f"{item['mau_so']}{item['ky_hieu']}"
-        ws.cell(row=curr_row, column=6).value = "" # F: Trống
-        ws.cell(row=curr_row, column=7).value = acc_map['tk_no'] # G
-        ws.cell(row=curr_row, column=14).value = format_tax_code(item['vat_raw']) # N
-        ws.cell(row=curr_row, column=15).value = thue_tren_bvmt # O
+        ws.cell(row=curr_row, column=6).value = "" 
+        ws.cell(row=curr_row, column=7).value = acc_map['tk_no'] 
+        ws.cell(row=curr_row, column=14).value = format_tax_code(item['vat_raw']) 
+        ws.cell(row=curr_row, column=15).value = thue_tren_bvmt 
         ws.cell(row=curr_row, column=16).value = acc_map['tk_thue_co']
         ws.cell(row=curr_row, column=17).value = acc_map['tk_thue_no']
-        ws.cell(row=curr_row, column=18).value = "TMT" # R
+        ws.cell(row=curr_row, column=18).value = "TMT" 
         ws.cell(row=curr_row, column=19).value = item['dvt']
         ws.cell(row=curr_row, column=20).value = ma_kho
         ws.cell(row=curr_row, column=21).value = sl_hd
-        ws.cell(row=curr_row, column=22).value = don_gia_bvmt # V
-        ws.cell(row=curr_row, column=23).value = tien_thue_bvmt # W
-        ws.cell(row=curr_row, column=24).value = acc_map['tk_dt_bvmt'] # X
+        ws.cell(row=curr_row, column=22).value = don_gia_bvmt 
+        ws.cell(row=curr_row, column=23).value = tien_thue_bvmt 
+        ws.cell(row=curr_row, column=24).value = acc_map['tk_dt_bvmt'] 
         ws.cell(row=curr_row, column=25).value = acc_map['tk_kho']
         ws.cell(row=curr_row, column=26).value = acc_map['tk_gia_von']
         ws.cell(row=curr_row, column=28).value = ma_vv
-        
         curr_row += 1
 
+    # --- GIAI ĐOẠN 3: QUÉT ĐỊNH DẠNG HẬU KỲ ---
+    print(f"[LOG] Bắt đầu quét hậu kỳ định dạng cho {ws.max_row - 5} dòng...")
+    
+    for r_idx in range(6, ws.max_row + 1):
+        cell_date = ws.cell(row=r_idx, column=3)
+        val = cell_date.value
+        
+        # Nếu vẫn là chuỗi, xóa khoảng trắng và ép kiểu lần cuối
+        if isinstance(val, str):
+            clean_val = val.strip()
+            try:
+                val = datetime.strptime(clean_val, '%d/%m/%Y')
+                cell_date.value = val
+            except:
+                pass
+        
+        # Áp định dạng hiển thị
+        if isinstance(val, datetime):
+            cell_date.number_format = 'dd/mm/yyyy'
+        
+        # Cột R luôn là Text
+        ws.cell(row=r_idx, column=18).number_format = '@'
+
+    print(f"[LOG] --- XỬ LÝ HOÀN TẤT ---")
+    
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
