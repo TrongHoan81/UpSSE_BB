@@ -17,16 +17,18 @@
 </head>
 <body class="bg-slate-50 min-h-screen py-10 px-4">
     <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+        <!-- Header Branding -->
         <div class="bg-white p-8 border-b border-slate-100">
             <div class="flex items-center justify-center space-x-5 mb-6">
                 <img src="{{ url_for('static', filename='Logo.png') }}" alt="PVOIL" class="h-24"> 
-                <div class="text-left">
+                <!-- THAY ĐỔI: Chuyển text-left thành text-center để cân đối -->
+                <div class="text-center">
                     <h2 class="text-xl font-black text-red-600 tracking-tighter uppercase leading-tight">Công Ty Cổ Phần Xăng Dầu</h2>
                     <h2 class="text-xl font-black text-red-600 tracking-tighter uppercase leading-tight">Dầu Khí Nam Định</h2>
                 </div>
             </div>
             <div class="h-1 w-20 bg-indigo-600 mx-auto rounded-full"></div>
-            <h1 class="text-2xl font-bold text-center text-slate-800 mt-6 tracking-tight">Công cụ xử lý dữ liệu UpSSE_BB</h1>
+            <h1 class="text-2xl font-bold text-center text-slate-800 mt-6 tracking-tight">Công cụ đồng bộ dữ liệu hóa đơn lên SSE</h1>
         </div>
 
         <div class="p-8">
