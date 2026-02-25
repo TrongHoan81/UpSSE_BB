@@ -102,14 +102,11 @@ def load_accounts_mapping():
 
 def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=None):
     """
-    Ghép nối và xử lý định khoản.
-    Đã sửa lỗi khoảng trắng thừa gây sai lệch định dạng ngày tháng.
+    Ghép nối và xử lý định khoản. 
+    Bổ sung điền giá trị "1" vào cột AD cho tất cả các dòng.
     """
     print(f"\n[LOG] --- BẮT ĐẦU XỬ LÝ GHÉP NỐI ---")
-    
-    # LÀM SẠCH KHOẢNG TRẮNG CỦA NGÀY NGAY LÚC NHẬN
     clean_manual_date = str(manual_date).strip() if manual_date else None
-    print(f"[LOG] manual_date sau khi làm sạch: '{clean_manual_date}'")
 
     bvmt_map = load_bvmt_mapping()
     makho_map = load_makho_mapping()
@@ -194,6 +191,10 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         ma_vv = ""
         if ten_kho_hd in vuviec_matrix: ma_vv = vuviec_matrix[ten_kho_hd].get(mat_hang_hd, "")
         ws.cell(row=curr_row, column=28).value = ma_vv
+        
+        # ĐIỀN CỘT AD (CỘT 30) = 1
+        ws.cell(row=curr_row, column=30).value = 1
+        
         curr_row += 1
 
     # --- GIAI ĐOẠN 2: DÒNG THUẾ BVMT ---
@@ -230,29 +231,25 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         ws.cell(row=curr_row, column=25).value = acc_map['tk_kho']
         ws.cell(row=curr_row, column=26).value = acc_map['tk_gia_von']
         ws.cell(row=curr_row, column=28).value = ma_vv
+        
+        # ĐIỀN CỘT AD (CỘT 30) = 1
+        ws.cell(row=curr_row, column=30).value = 1
+        
         curr_row += 1
 
     # --- GIAI ĐOẠN 3: QUÉT ĐỊNH DẠNG HẬU KỲ ---
     print(f"[LOG] Bắt đầu quét hậu kỳ định dạng cho {ws.max_row - 5} dòng...")
-    
     for r_idx in range(6, ws.max_row + 1):
         cell_date = ws.cell(row=r_idx, column=3)
         val = cell_date.value
-        
-        # Nếu vẫn là chuỗi, xóa khoảng trắng và ép kiểu lần cuối
         if isinstance(val, str):
             clean_val = val.strip()
             try:
                 val = datetime.strptime(clean_val, '%d/%m/%Y')
                 cell_date.value = val
-            except:
-                pass
-        
-        # Áp định dạng hiển thị
+            except: pass
         if isinstance(val, datetime):
             cell_date.number_format = 'dd/mm/yyyy'
-        
-        # Cột R luôn là Text
         ws.cell(row=r_idx, column=18).number_format = '@'
 
     print(f"[LOG] --- XỬ LÝ HOÀN TẤT ---")
