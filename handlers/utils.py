@@ -26,7 +26,9 @@ def normalize_name_advanced(name):
         r'\bBX\b': 'BEN XE', r'\bBẾN XE\b': 'BEN XE',
         r'\bĐT\b': 'DAU TU', r'\bĐẦU TƯ\b': 'DAU TU',
         r'\bXD\b': 'XANG DAU', r'\bXĂNG DẦU\b': 'XANG DAU',
-        r'\bXÂY DỰNG\b': 'XAY DUNG'
+        r'\bXÂY DỰNG\b': 'XAY DUNG',
+        r'\bDOANH NGHIỆP\b': 'DN',
+        r'\bDN\b': 'DOANH NGHIEP'
     }
     for pattern, replacement in replacements.items():
         s = re.sub(pattern, replacement, s)
