@@ -102,8 +102,8 @@ def load_accounts_mapping():
 
 def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=None):
     """
-    Ghép nối và xử lý định khoản. 
-    Bổ sung điền giá trị "1" vào cột AD cho tất cả các dòng.
+    Ghép nối và xử lý định khoản.
+    Đã cập nhật: Kế thừa dữ liệu kỹ thuật từ dòng hàng hóa sang dòng thuế BVMT.
     """
     print(f"\n[LOG] --- BẮT ĐẦU XỬ LÝ GHÉP NỐI ---")
     clean_manual_date = str(manual_date).strip() if manual_date else None
@@ -114,6 +114,9 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
     mahh_code_map, mahh_vcf_map = load_mahh_mapping()
     acc_map = load_accounts_mapping()
     
+    # Bộ nhớ tạm để lưu mặt hàng theo dòng phục vụ quét hậu kỳ
+    row_to_product = {}
+
     customer_map = {}
     dskh_path = os.path.join('Data', 'DSKH.xlsx')
     if os.path.exists(dskh_path):
@@ -144,6 +147,9 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         ten_kh_hd = item['ten_kh']
         sl_hd = round(item['so_luong'], 3)
         ten_kho_hd = item['kho_xuat_bkhd'].upper().strip()
+        
+        # Lưu mặt hàng cho dòng này
+        row_to_product[curr_row] = mat_hang_hd
 
         # Tra cứu BM19
         nhiet_do = None; ty_trong = None
@@ -154,6 +160,10 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
             if score > highest_score: highest_score = score; best_match = p
         if best_match and highest_score >= 0.9:
             nhiet_do = best_match['temp']; ty_trong = best_match['dens']
+
+        # Lưu lại để dòng thuế BVMT kế thừa
+        item['nhiet_do_bm19'] = nhiet_do
+        item['ty_trong_bm19'] = ty_trong
 
         don_gia_bvmt = bvmt_map.get(mat_hang_hd, 0)
         vat_rate = to_tax_rate_float(item['vat_raw'])
@@ -174,6 +184,7 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         ws.cell(row=curr_row, column=7).value = acc_map['tk_no']
         ws.cell(row=curr_row, column=11).value = ty_trong 
         ws.cell(row=curr_row, column=12).value = nhiet_do 
+        ws.cell(row=curr_row, column=13).value = "" # Để trống để điền ở bước quét hậu kỳ
         ws.cell(row=curr_row, column=14).value = format_tax_code(item['vat_raw'])
         ws.cell(row=curr_row, column=15).value = tien_thue_line1
         ws.cell(row=curr_row, column=16).value = acc_map['tk_thue_co']
@@ -191,10 +202,7 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         ma_vv = ""
         if ten_kho_hd in vuviec_matrix: ma_vv = vuviec_matrix[ten_kho_hd].get(mat_hang_hd, "")
         ws.cell(row=curr_row, column=28).value = ma_vv
-        
-        # ĐIỀN CỘT AD (CỘT 30) = 1
         ws.cell(row=curr_row, column=30).value = 1
-        
         curr_row += 1
 
     # --- GIAI ĐOẠN 2: DÒNG THUẾ BVMT ---
@@ -209,6 +217,9 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         ma_kho = makho_map.get(ten_kho_hd, "")
         ma_vv = ""
         if ten_kho_hd in vuviec_matrix: ma_vv = vuviec_matrix[ten_kho_hd].get(mat_hang_hd, "")
+        
+        # Lưu mặt hàng cho dòng này
+        row_to_product[curr_row] = mat_hang_hd
 
         ws.cell(row=curr_row, column=1).value = customer_map.get(item['mst_key'], "")
         ws.cell(row=curr_row, column=2).value = item['ten_kh']
@@ -217,6 +228,12 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         ws.cell(row=curr_row, column=5).value = f"{item['mau_so']}{item['ky_hieu']}"
         ws.cell(row=curr_row, column=6).value = "" 
         ws.cell(row=curr_row, column=7).value = acc_map['tk_no'] 
+
+        # KẾ THỪA DỮ LIỆU KỸ THUẬT TỪ DÒNG HÀNG HÓA
+        ws.cell(row=curr_row, column=11).value = item.get('ty_trong_bm19')
+        ws.cell(row=curr_row, column=12).value = item.get('nhiet_do_bm19')
+        ws.cell(row=curr_row, column=13).value = "" # Để trống để điền ở bước quét hậu kỳ
+
         ws.cell(row=curr_row, column=14).value = format_tax_code(item['vat_raw']) 
         ws.cell(row=curr_row, column=15).value = thue_tren_bvmt 
         ws.cell(row=curr_row, column=16).value = acc_map['tk_thue_co']
@@ -231,10 +248,7 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
         ws.cell(row=curr_row, column=25).value = acc_map['tk_kho']
         ws.cell(row=curr_row, column=26).value = acc_map['tk_gia_von']
         ws.cell(row=curr_row, column=28).value = ma_vv
-        
-        # ĐIỀN CỘT AD (CỘT 30) = 1
         ws.cell(row=curr_row, column=30).value = 1
-        
         curr_row += 1
 
     # --- GIAI ĐOẠN 3: QUÉT ĐỊNH DẠNG HẬU KỲ ---
@@ -242,14 +256,33 @@ def merge_and_fill_template(invoice_data, bm19_data, template_path, manual_date=
     for r_idx in range(6, ws.max_row + 1):
         cell_date = ws.cell(row=r_idx, column=3)
         val = cell_date.value
+        
+        # 1. Ép kiểu và chuẩn hóa Ngày tháng
         if isinstance(val, str):
             clean_val = val.strip()
             try:
                 val = datetime.strptime(clean_val, '%d/%m/%Y')
                 cell_date.value = val
             except: pass
+        
         if isinstance(val, datetime):
             cell_date.number_format = 'dd/mm/yyyy'
+            
+            # 2. LOGIC VCF VÙNG MIỀN BỔ SUNG (Dựa trên ngày đã chuẩn hóa thành công)
+            # Chỉ điền nếu Cột M (13) trống VÀ Cột K, L (11, 12) cũng trống
+            if not ws.cell(row=r_idx, column=13).value and \
+               not ws.cell(row=r_idx, column=11).value and \
+               not ws.cell(row=r_idx, column=12).value:
+                
+                prod_name = row_to_product.get(r_idx)
+                if prod_name and prod_name in mahh_vcf_map:
+                    try:
+                        month = val.month
+                        season = 'winter' if month in [1, 2, 3, 4, 11, 12] else 'summer'
+                        ws.cell(row=r_idx, column=13).value = mahh_vcf_map[prod_name][season]
+                    except: pass
+
+        # 3. Định dạng Text cho Mã hàng
         ws.cell(row=r_idx, column=18).number_format = '@'
 
     print(f"[LOG] --- XỬ LÝ HOÀN TẤT ---")
