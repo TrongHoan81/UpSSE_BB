@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PVOIL Nam Định - Xử lý BKHD</title>
+    <title>PVOIL Nam Định - Xử lý Dữ liệu UpSSE</title>
     <link rel="icon" href="{{ url_for('static', filename='Logo.png') }}" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -21,44 +21,79 @@
         <div class="bg-white p-8 border-b border-slate-100">
             <div class="flex items-center justify-center space-x-5 mb-6">
                 <img src="{{ url_for('static', filename='Logo.png') }}" alt="PVOIL" class="h-24"> 
-                <!-- THAY ĐỔI: Chuyển text-left thành text-center để cân đối -->
                 <div class="text-center">
                     <h2 class="text-xl font-black text-red-600 tracking-tighter uppercase leading-tight">Công Ty Cổ Phần Xăng Dầu</h2>
                     <h2 class="text-xl font-black text-red-600 tracking-tighter uppercase leading-tight">Dầu Khí Nam Định</h2>
                 </div>
             </div>
             <div class="h-1 w-20 bg-indigo-600 mx-auto rounded-full"></div>
-            <h1 class="text-2xl font-bold text-center text-slate-800 mt-6 tracking-tight">Công cụ đồng bộ dữ liệu hóa đơn lên SSE</h1>
+            <h1 class="text-2xl font-bold text-center text-slate-800 mt-6 tracking-tight">Công cụ xử lý dữ liệu UpSSE_BB</h1>
+        </div>
+
+        <!-- TAB NAVIGATION -->
+        <div class="flex border-b border-slate-200 bg-slate-50">
+            <button id="btn-tab-ban-buon" onclick="switchTab('ban-buon')" class="w-1/2 py-4 text-center font-bold text-indigo-600 border-b-4 border-indigo-600 uppercase text-sm tracking-wide transition-all">
+                Hóa đơn Bán buôn
+            </button>
+            <button id="btn-tab-dieu-chuyen" onclick="switchTab('dieu-chuyen')" class="w-1/2 py-4 text-center font-bold text-slate-400 border-b-4 border-transparent hover:text-slate-600 uppercase text-sm tracking-wide transition-all">
+                Phiếu xuất Điều chuyển
+            </button>
         </div>
 
         <div class="p-8">
             <div id="alert-container"></div>
-            <div class="mb-8 p-5 bg-indigo-50 border border-indigo-100 rounded-2xl">
-                <h4 class="text-sm font-bold text-indigo-800 mb-3 flex items-center italic">HƯỚNG DẪN SỬ DỤNG:</h4>
-                <ul class="list-disc list-inside space-y-2 text-sm text-slate-700">
-                    <li>Sử dụng file <span class="font-bold">Bảng kê hóa đơn (BKHD)</span> kết xuất từ hệ thống HĐĐT.</li>
-                    <li>Sử dụng file <span class="font-bold">BM19</span> để lấy thông tin Nhiệt độ và Tỷ trọng thực tế.</li>
-                    <li>Công cụ sẽ tự tách dòng <span class="font-bold">Thuế BVMT</span> xuống cuối danh sách.</li>
-                </ul>
+
+            <!-- ================= TAB 1: BÁN BUÔN (CŨ) ================= -->
+            <div id="tab-ban-buon" class="block scale-in">
+                <div class="mb-8 p-5 bg-indigo-50 border border-indigo-100 rounded-2xl">
+                    <h4 class="text-sm font-bold text-indigo-800 mb-3 flex items-center italic">HƯỚNG DẪN SỬ DỤNG:</h4>
+                    <ul class="list-disc list-inside space-y-2 text-sm text-slate-700">
+                        <li>Sử dụng file <span class="font-bold">Bảng kê hóa đơn (BKHD)</span> kết xuất từ hệ thống HĐĐT.</li>
+                        <li>Sử dụng file <span class="font-bold">BM19</span> để lấy thông tin Nhiệt độ và Tỷ trọng thực tế.</li>
+                        <li>Công cụ sẽ tự tách dòng <span class="font-bold">Thuế BVMT</span> xuống cuối danh sách.</li>
+                    </ul>
+                </div>
+
+                <form id="upload-form" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">1. Bảng kê hóa đơn (BKHD)</label>
+                        <input type="file" name="file_bkhd" required class="w-full border-2 border-slate-100 p-3 rounded-xl text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500/20 outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">2. Biểu mẫu BM19 (Tùy chọn)</label>
+                        <input type="file" name="file_bm19" class="w-full border-2 border-slate-100 p-3 rounded-xl text-sm bg-slate-50 outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-lg uppercase tracking-wide">
+                        Xử lý & Tải về SVDetail9
+                    </button>
+                </form>
             </div>
 
-            <form id="upload-form" class="space-y-6">
-                <div class="space-y-2">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">1. Bảng kê hóa đơn (BKHD)</label>
-                    <input type="file" name="file_bkhd" required class="w-full border-2 border-slate-100 p-3 rounded-xl text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500/20 outline-none">
+            <!-- ================= TAB 2: ĐIỀU CHUYỂN (MỚI) ================= -->
+            <div id="tab-dieu-chuyen" class="hidden scale-in">
+                <div class="mb-8 p-5 bg-teal-50 border border-teal-100 rounded-2xl">
+                    <h4 class="text-sm font-bold text-teal-800 mb-3 flex items-center italic">HƯỚNG DẪN SỬ DỤNG:</h4>
+                    <ul class="list-disc list-inside space-y-2 text-sm text-slate-700">
+                        <li>Chỉ yêu cầu tải lên tệp <span class="font-bold">Biểu mẫu BM19</span>.</li>
+                        <li>Hệ thống sẽ tự động tính toán và tạo ra file <span class="font-bold">Phiếu xuất điều chuyển</span> đúng định dạng để upload lên phần mềm SSE.</li>
+                    </ul>
                 </div>
-                <div class="space-y-2">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">2. Biểu mẫu BM19 (Tùy chọn)</label>
-                    <input type="file" name="file_bm19" class="w-full border-2 border-slate-100 p-3 rounded-xl text-sm bg-slate-50 outline-none">
-                </div>
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-95 text-lg uppercase tracking-wide">
-                    Xử lý & Tải về SVDetail9
-                </button>
-            </form>
 
+                <form id="upload-form-transfer" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">1. Biểu mẫu BM19</label>
+                        <input type="file" name="file_bm19_transfer" required class="w-full border-2 border-slate-100 p-3 rounded-xl text-sm bg-slate-50 focus:ring-2 focus:ring-teal-500/20 outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-teal-200 transition-all active:scale-95 text-lg uppercase tracking-wide">
+                        Xử lý & Tải về Phiếu Điều Chuyển
+                    </button>
+                </form>
+            </div>
+
+            <!-- GLOBAL LOADING & WARNING -->
             <div id="loading" class="hidden mt-8 text-center scale-in">
-                <div class="loader inline-block mb-3"></div>
-                <p class="text-sm font-bold text-indigo-600">Đang phân tích và xử lý định khoản...</p>
+                <div class="loader inline-block mb-3" id="loader-spinner"></div>
+                <p class="text-sm font-bold text-indigo-600" id="loading-text">Đang phân tích và xử lý định khoản...</p>
             </div>
 
             <div class="mt-10 blinking-warning bg-amber-50 border border-amber-200 p-5 rounded-2xl text-center">
@@ -73,7 +108,7 @@
         </div>
     </div>
 
-    <!-- MODAL XÁC NHẬN NGÀY -->
+    <!-- MODAL XÁC NHẬN NGÀY (CỦA TAB BÁN BUÔN) -->
     <div id="date-modal" class="fixed inset-0 bg-slate-900/80 hidden flex items-center justify-center p-4 z-50 backdrop-blur-md">
         <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl scale-in">
             <h3 class="text-xl font-black text-slate-900 mb-2">Xác nhận Ngày</h3>
@@ -92,14 +127,52 @@
     </div>
 
     <script>
-        const form = document.getElementById('upload-form');
+        // --- LOGIC CHUYỂN TAB ---
+        function switchTab(tabId) {
+            const tabBanBuon = document.getElementById('tab-ban-buon');
+            const tabDieuChuyen = document.getElementById('tab-dieu-chuyen');
+            const btnBanBuon = document.getElementById('btn-tab-ban-buon');
+            const btnDieuChuyen = document.getElementById('btn-tab-dieu-chuyen');
+
+            if (tabId === 'ban-buon') {
+                tabBanBuon.classList.remove('hidden');
+                tabBanBuon.classList.add('block');
+                tabDieuChuyen.classList.remove('block');
+                tabDieuChuyen.classList.add('hidden');
+                
+                // Style nút Bán buôn (Active)
+                btnBanBuon.className = "w-1/2 py-4 text-center font-bold text-indigo-600 border-b-4 border-indigo-600 uppercase text-sm tracking-wide transition-all";
+                // Style nút Điều chuyển (Inactive)
+                btnDieuChuyen.className = "w-1/2 py-4 text-center font-bold text-slate-400 border-b-4 border-transparent hover:text-slate-600 uppercase text-sm tracking-wide transition-all";
+            } else {
+                tabDieuChuyen.classList.remove('hidden');
+                tabDieuChuyen.classList.add('block');
+                tabBanBuon.classList.remove('block');
+                tabBanBuon.classList.add('hidden');
+                
+                // Style nút Điều chuyển (Active - dùng màu Teal)
+                btnDieuChuyen.className = "w-1/2 py-4 text-center font-bold text-teal-600 border-b-4 border-teal-600 uppercase text-sm tracking-wide transition-all";
+                // Style nút Bán buôn (Inactive)
+                btnBanBuon.className = "w-1/2 py-4 text-center font-bold text-slate-400 border-b-4 border-transparent hover:text-slate-600 uppercase text-sm tracking-wide transition-all";
+            }
+            // Ẩn các thông báo cũ khi chuyển tab
+            document.getElementById('alert-container').innerHTML = '';
+        }
+
+        // --- LOGIC XỬ LÝ FORM ---
+        const formBanBuon = document.getElementById('upload-form');
+        const formDieuChuyen = document.getElementById('upload-form-transfer');
         const modal = document.getElementById('date-modal');
         const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loading-text');
 
-        form.onsubmit = async (e) => {
+        // Form 1: Hóa đơn Bán buôn (GIỮ NGUYÊN HOÀN TOÀN LOGIC CŨ)
+        formBanBuon.onsubmit = async (e) => {
             e.preventDefault();
+            loadingText.innerText = 'Đang phân tích và xử lý định khoản...';
+            loadingText.className = 'text-sm font-bold text-indigo-600';
             loading.classList.remove('hidden');
-            processRequest(new FormData(form));
+            processRequest(new FormData(formBanBuon));
         };
 
         async function processRequest(formData) {
@@ -116,14 +189,7 @@
                         modal.classList.remove('hidden');
                     } else if (result.status === 'error') { showAlert(result.message, 'danger'); }
                 } else {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url; a.download = "SVDetail9_Result.xlsx";
-                    document.body.appendChild(a); a.click();
-                    window.URL.revokeObjectURL(url);
-                    loading.classList.add('hidden');
-                    showAlert('Xử lý thành công! Tệp đã tải xuống.', 'success');
+                    downloadFile(response, "SVDetail9_Result.xlsx", "Xử lý Bán buôn thành công!");
                 }
             } catch (err) { loading.classList.add('hidden'); showAlert('Lỗi hệ thống.', 'danger'); }
         }
@@ -132,6 +198,41 @@
             formData.append('confirmed_date', dateStr);
             modal.classList.add('hidden'); loading.classList.remove('hidden');
             processRequest(formData);
+        }
+
+        // Form 2: Phiếu xuất Điều chuyển (MỚI BỔ SUNG)
+        formDieuChuyen.onsubmit = async (e) => {
+            e.preventDefault();
+            loadingText.innerText = 'Đang tính toán Phiếu xuất điều chuyển...';
+            loadingText.className = 'text-sm font-bold text-teal-600'; // Đổi màu chữ loading cho tab này
+            loading.classList.remove('hidden');
+            
+            try {
+                // Sẽ gọi đến endpoint mới /process_transfer theo kế hoạch
+                const response = await fetch('/process_transfer', { method: 'POST', body: new FormData(formDieuChuyen) });
+                if (response.headers.get('Content-Type').includes('application/json')) {
+                    const result = await response.json();
+                    loading.classList.add('hidden');
+                    if (result.status === 'error') { showAlert(result.message, 'danger'); }
+                } else {
+                    downloadFile(response, "Phieu_Xuat_Dieu_Chuyen.xlsx", "Xử lý Điều chuyển thành công!");
+                }
+            } catch (err) { 
+                loading.classList.add('hidden'); 
+                showAlert('Lỗi hệ thống. Chưa khởi tạo tính năng này!', 'danger'); 
+            }
+        };
+
+        // Hàm hỗ trợ tải file dùng chung
+        async function downloadFile(response, defaultFilename, successMsg) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = defaultFilename;
+            document.body.appendChild(a); a.click();
+            window.URL.revokeObjectURL(url);
+            loading.classList.add('hidden');
+            showAlert(successMsg + ' Tệp đã được tải xuống.', 'success');
         }
 
         function showAlert(msg, type) {

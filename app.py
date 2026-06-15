@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, send_file, jsonify
 from handlers.invoice_handler import process_invoice_data
 from handlers.bm19_handler import process_bm19_data 
 from handlers.merge_handler import merge_and_fill_template
+from handlers.transfer_handler import process_transfer_data
 
 app = Flask(__name__)
 app.secret_key = "pvoil_namdinh_upsse_bb_final_2026"
@@ -59,6 +60,28 @@ def process():
             output_buffer,
             as_attachment=True,
             download_name="Ket_Qua_UpSSE_BB.xlsx",
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+
+@app.route('/process_transfer', methods=['POST'])
+def process_transfer():
+    try:
+        file_bm19 = request.files.get('file_bm19_transfer')
+        if not file_bm19:
+            return jsonify({'status': 'error', 'message': 'Vui lòng chọn tệp BM19!'})
+
+        # Đường dẫn file mẫu Template dành riêng cho Điều chuyển
+        template_path = os.path.join('Data', 'template_phieu_xuat.xlsx')
+        
+        # Gọi hàm xử lý từ transfer_handler
+        output_buffer = process_transfer_data(file_bm19, template_path)
+
+        return send_file(
+            output_buffer,
+            as_attachment=True,
+            download_name="Phieu_Xuat_Dieu_Chuyen.xlsx",
             mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
     except Exception as e:
