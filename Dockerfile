@@ -13,4 +13,5 @@ COPY . .
 
 # Khởi chạy server Gunicorn (Tối ưu cho môi trường Production)
 # Cloud Run tự động cấp cổng qua biến môi trường $PORT (thường là 8080)
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
+RUN chmod -R 755 /app/Data
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 60 app:app
