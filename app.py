@@ -19,9 +19,6 @@ def index():
 @app.route('/process', methods=['POST'])
 def process():
     try:
-        # --- TẠM NGẮT CHỨC NĂNG THEO YÊU CẦU ---
-        return jsonify({'status': 'error', 'message': 'Lỗi nghiêm trọng trong thuật toán xử lý'})
-
         file_bkhd = request.files.get('file_bkhd')
         file_bm19 = request.files.get('file_bm19')
         
@@ -71,9 +68,6 @@ def process():
 @app.route('/process_transfer', methods=['POST'])
 def process_transfer():
     try:
-        # --- TẠM NGẮT CHỨC NĂNG THEO YÊU CẦU ---
-        return jsonify({'status': 'error', 'message': 'Lỗi nghiêm trọng trong thuật toán xử lý'})
-
         file_bm19 = request.files.get('file_bm19_transfer')
         if not file_bm19:
             return jsonify({'status': 'error', 'message': 'Vui lòng chọn tệp BM19!'})
